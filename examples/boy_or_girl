@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+# https://en.wikipedia.org/wiki/Boy_or_Girl_paradox
+
+require_relative '../lib/simulation'
+
+$question = ARGV.first&.to_i || 2
+$times = 100_000
+
+$s = Simulation.new do
+  c = 2.times.map { rand(2) == 0 }
+  case $question
+  when 1
+    redo unless c.last
+  when 2
+    redo unless c.any?
+  when 3
+    redo unless c.sample
+  when 4, 5
+    r = $question == 4 ? 7 : 100
+    q = c.map { |e| e && rand(r) == 0 }
+    redo unless q.any?
+  end
+
+  c.all?
+end
+
+puts 'Average: %0.2f%%' % [100 * $s.run($times)]
