@@ -24,6 +24,11 @@ class Simulation
     @results.instance_eval { sum.to_f / size }
   end
 
+  def stats
+    q = quantiles(@results, [0.05, 0.25, 0.50, 0.75, 0.95])
+    Stats.new(*q)
+  end
+
   private
 
   def to_f(v)
@@ -42,6 +47,36 @@ class Simulation
     each_with_index do |r, n|
       avg = (avg * n + r) / (n + 1)
       print "%0.08f (%i)\r" % [avg, n]
+    end
+  end
+
+  Stats = Struct.new(:centile_5, :quartile_1, :median, :quartile_3, :centile_95) do
+
+    attr_reader :quantiles
+
+    def initialize(*args)
+      q = [0.05, 0.25, 0.50, 0.75, 0.95]
+      @quantiles = [q, args].transpose.to_h
+      super
+    end
+
+    def [](*args)
+      @quantiles[*args]
+    end
+
+    def inspect
+      @quantiles
+    end
+
+  end
+
+  def quantiles(data, probs)
+    values = data.sort
+
+    probs.map do |prob|
+      x = 1 + (values.count - 1) * prob
+      mod = x % 1
+      (1 - mod) * values[x.floor - 1] + (mod) * values[x.ceil - 1]
     end
   end
 
