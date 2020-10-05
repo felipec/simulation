@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+# https://en.wikipedia.org/wiki/Monty_Hall_problem
+
+require_relative '../lib/simulation'
+
+$n_doors = ARGV[0]&.to_i || 3
+$times = ARGV[1]&.to_i || 10_000
+$doors = Array.new($n_doors)
+
+$s = Simulation.new do
+  $doors.fill(false)
+  $doors[rand($doors.size)] = true
+  $doors.sample
+end
+
+puts 'Doors: %i' % [$doors.size]
+puts 'Times: %i' % [$times]
+puts 'Average: %0.0f%%' % [100 * $s.run($times)]
