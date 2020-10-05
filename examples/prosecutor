@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+# https://en.wikipedia.org/wiki/Prosecutor's_fallacy
+
+require_relative '../lib/simulation'
+
+$p = ARGV[0]&.to_i || 10_000_000
+$times = ARGV[1]&.to_i || 10_000
+
+$s = Simulation.new do
+  e = 1.0 / 1_000_000
+
+  ($p * e - 1) / ($p * e)
+end
+
+puts 'Population: %i' % [$p]
+puts 'Times: %i' % [$times]
+puts 'Average: %0.0f%%' % [100 * $s.run($times)]
