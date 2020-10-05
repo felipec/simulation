@@ -21,3 +21,5 @@ end
 puts 'Population: %i' % [$p]
 puts 'Times: %i' % [$times]
 puts 'Average: %0.0f%%' % [100 * $s.run($times)]
+q = $s.stats.quantiles.values_at(0.25, 0.50, 0.75).map { |e| e * 100 }
+puts 'Cuartiles: %0.0f%%, %0.0f%%, %0.0f%%' % q
