@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require 'distribution'
+require_relative '../lib/simulation'
+
+$ticks = ARGV.first&.to_i || 250
+$interest = 0.15
+$volatility = 0.10
+
+$normal = Distribution::Normal.rng($interest / $ticks, $volatility / $ticks ** 0.5)
+
+Simulation.new { $normal.call > 0 }.run
