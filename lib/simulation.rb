@@ -15,9 +15,9 @@ class Simulation
     end
   end
 
-  def run(trials)
-    @results = first(trials)
-    average
+  def run(trials = nil)
+    dynamic_run unless trials
+    static_run(trials)
   end
 
   def average
@@ -30,6 +30,19 @@ class Simulation
     return 1.0 if v === true
     return 0.0 if v === false
     v.to_f
+  end
+
+  def static_run(trials)
+    @results = first(trials)
+    average
+  end
+
+  def dynamic_run
+    avg = 0.0
+    each_with_index do |r, n|
+      avg = (avg * n + r) / (n + 1)
+      print "%0.08f (%i)\r" % [avg, n]
+    end
   end
 
 end
