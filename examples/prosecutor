@@ -2,13 +2,18 @@
 
 # https://en.wikipedia.org/wiki/Prosecutor's_fallacy
 
+require 'distribution'
 require_relative '../lib/simulation'
 
 $p = ARGV[0]&.to_i || 10_000_000
 $times = ARGV[1]&.to_i || 10_000
 
+$normal = Distribution::Normal.rng(1, 1)
+
 $s = Simulation.new do
-  e = 1.0 / 1_000_000
+  x = $normal.call
+  redo if x < 1
+  e = x / 1_000_000
 
   ($p * e - 1) / ($p * e)
 end
