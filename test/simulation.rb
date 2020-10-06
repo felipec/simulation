@@ -19,11 +19,13 @@ class SimulationTests < Test::Unit::TestCase
     assert_equal(0.5, v)
   end
 
-  def test_stats
+  def test_quantiles
     s = Simulation.new { |n| n / 10.0 }
     s.run(11)
-    [0.05, 0.25, 0.50, 0.75, 0.95].each do |e|
-      assert_in_delta(e, s.stats[e])
+    probs = [0.05, 0.25, 0.50, 0.75, 0.95]
+    q = s.quantiles(probs)
+    [probs, q].transpose.each do |e|
+      assert_in_delta(*e)
     end
   end
 
