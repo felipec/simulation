@@ -24,7 +24,7 @@ class Simulation
     @results.instance_eval { sum.to_f / size }
   end
 
-  def quantiles(probs)
+  def quantiles(probs = [0.25, 0.50, 0.75])
     values = @results.sort
 
     probs.map do |prob|
