@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/simulation'
+
+$times = ARGV.first&.to_i || 1_000_000
+$s = Simulation.new {
+  6.times.map { rand(6) == 0 }.any?
+}
+
+puts 'Times: %i' % [$times]
+puts 'Average: %0.0f%%' % [100 * $s.run($times)]
