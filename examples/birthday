@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/simulation'
+
+# https://en.wikipedia.org/wiki/Birthday_problem
+
+$n = ARGV[0]&.to_i || 23
+$times = ARGV[1]&.to_i || 1_000
+
+$s = Simulation.new do
+  birthdays = Array.new($n) { rand(365.25) }
+  birthdays.any? { |e| birthdays.count(e) > 1 }
+end
+
+puts 'Times: %i' % [$times]
+puts 'Average: %0.0f%%' % [100 * $s.run($times)]
