@@ -20,6 +20,11 @@ class Simulation
     static_run(trials)
   end
 
+  def run_with_report(trials)
+    puts 'Times: %i' % [trials]
+    puts 'Average: %0.2f%%' % [100 * run(trials)]
+  end
+
   def average
     @results.instance_eval { sum.to_f / size }
   end

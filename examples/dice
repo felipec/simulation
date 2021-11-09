@@ -7,5 +7,4 @@ $s = Simulation.new {
   6.times.map { rand(6) == 0 }.any?
 }
 
-puts 'Times: %i' % [$times]
-puts 'Average: %0.0f%%' % [100 * $s.run($times)]
+$s.run_with_report($times)

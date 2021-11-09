@@ -25,4 +25,4 @@ $s = Simulation.new do
   c.all?
 end
 
-puts 'Average: %0.2f%%' % [100 * $s.run($times)]
+$s.run_with_report($times)
