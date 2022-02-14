@@ -10,20 +10,64 @@ body {
   height: 100%;
   display: flex;
   margin: 0;
+  font-family: sans-serif;
+}
+main {
+  flex: 1;
+}
+aside {
+  background-color: hsl(240, 6.25%, 87.5%);
+  max-width: 20%;
+  padding: 4px;
 }
 canvas {
   background-color: hsl(240, 6.25%, 12.5%);
-  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+#controls {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-gap: 8px;
+}
+label {
+  font-weight: bold;
+}
+input {
+  width: 7em;
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
 
-<canvas id="canvas"></canvas>
+<aside>
+  <div id="controls">
+    <label>Time</label>
+    <input v-model.number="time">
+    <label>Samples</label>
+    <input v-model.number="samples">
+  </div>
+</aside>
+
+<main>
+  <canvas id="canvas"></canvas>
+</main>
 
 <script>
 
+var controls = Vue.createApp({
+  data() {
+    return {
+      time: 100,
+      samples: 100,
+    }
+  },
+  watch: {
+    time() { regenerate(); },
+    samples() { regenerate(); },
+  },
+}).mount('#controls')
+
 const height = 100;
-const n_time = 100;
-const n_samples = 100;
 const margin = 100;
 
 const show_ensamble = false;
@@ -35,6 +79,7 @@ const ctx = canvas.getContext('2d');
 const number_f = new Intl.NumberFormat('en-US', { notation: 'compact' });
 
 var span;
+var samples;
 
 function Sample() {
   this.history = [ 100 ],
@@ -59,6 +104,8 @@ function Sample() {
 }
 
 function draw_background() {
+  ctx.clearRect(-canvas.width, -canvas.height / 2, 2 * canvas.width, canvas.height);
+
   ctx.font = '16px monospace';
   ctx.fillStyle = 'hsl(0, 100%, 100%)';
   ctx.textAlign = 'center';
@@ -104,15 +151,15 @@ function draw() {
 
     if (show_ensamble) {
       for (const [si,sample] of ordered.entries()) {
-        const hue = si * 360 / n_samples;
+        const hue = si * 360 / controls.samples;
         sample.draw(`hsl(${hue}, 75%, 75%, 75%)`);
       }
     }
 
     if (show_representatives) {
       ordered[0].draw('hsl(0, 75%, 75%)');
-      ordered[Math.trunc(n_samples / 2) - 1].draw('hsl(60, 75%, 75%)');
-      ordered[n_samples - 1].draw('hsl(120, 75%, 75%)');
+      ordered[Math.trunc(controls.samples / 2) - 1].draw('hsl(60, 75%, 75%)');
+      ordered[controls.samples - 1].draw('hsl(120, 75%, 75%)');
     }
   }
 
@@ -121,7 +168,7 @@ function draw() {
 
     const mean = new Sample();
 
-    for (let ti = 0; ti < n_time; ti++) {
+    for (let ti = 0; ti < controls.time; ti++) {
       mean.value = samples.reduce((m, sample, si) => (m * si + sample.history[ti]) / (si + 1), 0);
     }
 
@@ -129,11 +176,25 @@ function draw() {
   }
 }
 
-function resize_canvas() {
-  canvas.width = document.body.offsetWidth - 1;
-  canvas.height = document.body.offsetHeight;
+function regenerate() {
+  samples = new Array(controls.samples).fill(null).map(_ => new Sample());
 
-  span = canvas.width / n_time;
+  span = canvas.width / controls.time;
+
+  for (let sample of samples) {
+    for (let ti = 0; ti < controls.time; ti++) {
+      const heads = Math.random() >= 0.5;
+      sample.value *= heads ? 1.5 : 0.6;
+    }
+  }
+  draw();
+}
+
+function resize_canvas() {
+  canvas.width = canvas.offsetWidth - 1;
+  canvas.height = canvas.offsetHeight;
+
+  span = canvas.width / controls.time;
 
   ctx.translate(margin, canvas.height / 2);
   ctx.scale(1, -1);
@@ -142,15 +203,7 @@ function resize_canvas() {
 
 window.addEventListener('resize', resize_canvas, false);
 
-const samples = new Array(n_samples).fill(null).map(_ => new Sample());
-
-for (let sample of samples) {
-  for (let ti = 0; ti < n_time; ti++) {
-    const heads = Math.random() >= 0.5;
-    sample.value *= heads ? 1.5 : 0.6;
-  }
-}
-
+regenerate();
 resize_canvas();
 
 </script>
