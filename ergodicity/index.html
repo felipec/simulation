@@ -191,7 +191,7 @@ function draw() {
 function regenerate() {
   samples = new Array(controls.samples).fill(null).map(_ => new Sample());
 
-  span = canvas.width / controls.time;
+  span = (canvas.width - margin) / controls.time;
 
   for (let sample of samples) {
     for (let ti = 0; ti < controls.time; ti++) {
@@ -206,7 +206,7 @@ function resize_canvas() {
   canvas.width = canvas.offsetWidth - 1;
   canvas.height = canvas.offsetHeight;
 
-  span = canvas.width / controls.time;
+  span = (canvas.width - margin) / controls.time;
 
   ctx.translate(margin, canvas.height / 2);
   ctx.scale(1, -1);
