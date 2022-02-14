@@ -169,9 +169,13 @@ function draw() {
     }
 
     if (controls.show_reps) {
-      ordered[0].draw('hsl(0, 75%, 75%)');
-      ordered[Math.trunc(controls.samples / 2) - 1].draw('hsl(60, 75%, 75%)');
-      ordered[controls.samples - 1].draw('hsl(120, 75%, 75%)');
+      if (ordered.length >= 3) {
+        ordered[0].draw('hsl(0, 75%, 75%)');
+        ordered[Math.trunc(controls.samples / 2) - 1].draw('hsl(60, 75%, 75%)');
+        ordered[controls.samples - 1].draw('hsl(120, 75%, 75%)');
+      } else {
+        ordered[0].draw('hsl(60, 75%, 75%)');
+      }
     }
   }
 
