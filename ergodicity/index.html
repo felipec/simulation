@@ -1,0 +1,156 @@
+<!doctype html>
+
+<meta charset="utf-8">
+<title>Ergodicity</title>
+<style>
+html {
+  height: 100%;
+}
+body {
+  height: 100%;
+  display: flex;
+  margin: 0;
+}
+canvas {
+  background-color: hsl(240, 6.25%, 12.5%);
+  flex: 1;
+}
+</style>
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+const height = 100;
+const n_time = 100;
+const n_samples = 100;
+const margin = 100;
+
+const show_ensamble = false;
+const show_representatives = true;
+const show_average = true;
+
+const ctx = canvas.getContext('2d');
+
+const number_f = new Intl.NumberFormat('en-US', { notation: 'compact' });
+
+var span;
+
+function Sample() {
+  this.history = [ 100 ],
+
+  this.draw = function(color) {
+    ctx.strokeStyle = color;
+
+    ctx.beginPath();
+    ctx.moveTo(0, height);
+    for (const [i,e] of this.history.entries()) {
+      ctx.lineTo(span * i, (height / 2) * Math.log10(e));
+    }
+    ctx.stroke();
+  };
+
+  Object.defineProperties(this, {
+    value: {
+      get: function() { return this.history[this.history.length - 1]; },
+      set: function(v) { this.history.push(v); },
+    }
+  });
+}
+
+function draw_background() {
+  ctx.font = '16px monospace';
+  ctx.fillStyle = 'hsl(0, 100%, 100%)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.lineWidth = 1;
+
+  ctx.strokeStyle = 'hsl(0, 100%, 100%, 75%)';
+  ctx.beginPath();
+  for (let i = -10; i < 10; i++) {
+    ctx.moveTo(0, 0.5 * i * height);
+    ctx.lineTo(ctx.canvas.width, 0.5 * i * height);
+  }
+  ctx.stroke();
+
+  ctx.save();
+  ctx.scale(1, -1);
+  for (let i = -3; i < 10; i++) {
+    ctx.fillText('$' + number_f.format(10 ** i), -(margin / 2), -0.5 * i * height);
+  }
+  ctx.restore();
+
+  ctx.lineWidth = 2;
+
+  ctx.strokeStyle = 'hsl(0, 100%, 100%)';
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(ctx.canvas.width, 0);
+  ctx.stroke();
+
+  ctx.strokeStyle = 'hsl(120, 75%, 75%)';
+  ctx.beginPath();
+  ctx.moveTo(0, height);
+  ctx.lineTo(ctx.canvas.width, height);
+  ctx.stroke();
+}
+
+function draw() {
+  draw_background();
+
+  if (show_ensamble || show_representatives) {
+    const ordered = samples.sort((a,b) => a.value - b.value);
+
+    if (show_ensamble) {
+      for (const [si,sample] of ordered.entries()) {
+        const hue = si * 360 / n_samples;
+        sample.draw(`hsl(${hue}, 75%, 75%, 75%)`);
+      }
+    }
+
+    if (show_representatives) {
+      ordered[0].draw('hsl(0, 75%, 75%)');
+      ordered[Math.trunc(n_samples / 2) - 1].draw('hsl(60, 75%, 75%)');
+      ordered[n_samples - 1].draw('hsl(120, 75%, 75%)');
+    }
+  }
+
+  if (show_average) {
+    ctx.lineWidth = 4;
+
+    const mean = new Sample();
+
+    for (let ti = 0; ti < n_time; ti++) {
+      mean.value = samples.reduce((m, sample, si) => (m * si + sample.history[ti]) / (si + 1), 0);
+    }
+
+    mean.draw('hsl(240, 75%, 75%)');
+  }
+}
+
+function resize_canvas() {
+  canvas.width = document.body.offsetWidth - 1;
+  canvas.height = document.body.offsetHeight;
+
+  span = canvas.width / n_time;
+
+  ctx.translate(margin, canvas.height / 2);
+  ctx.scale(1, -1);
+  draw();
+}
+
+window.addEventListener('resize', resize_canvas, false);
+
+const samples = new Array(n_samples).fill(null).map(_ => new Sample());
+
+for (let sample of samples) {
+  for (let ti = 0; ti < n_time; ti++) {
+    const heads = Math.random() >= 0.5;
+    sample.value *= heads ? 1.5 : 0.6;
+  }
+}
+
+resize_canvas();
+
+</script>
