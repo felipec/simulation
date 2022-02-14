@@ -48,6 +48,12 @@ button {
     <input v-model.number="time">
     <label>Samples</label>
     <input v-model.number="samples">
+    <label>Mean</label>
+    <input type="checkbox" v-model="show_mean">
+    <label>Reps</label>
+    <input type="checkbox" v-model="show_reps">
+    <label>Ensamble</label>
+    <input type="checkbox" v-model="show_ensamble">
     <button onclick="regenerate()">Run</button>
   </div>
 </aside>
@@ -63,20 +69,22 @@ var controls = Vue.createApp({
     return {
       time: 100,
       samples: 100,
+      show_mean: true,
+      show_reps: true,
+      show_ensamble: false,
     }
   },
   watch: {
     time() { regenerate(); },
     samples() { regenerate(); },
+    show_mean() { draw(); },
+    show_reps() { draw(); },
+    show_ensamble() { draw(); },
   },
 }).mount('#controls')
 
 const height = 100;
 const margin = 100;
-
-const show_ensamble = false;
-const show_representatives = true;
-const show_average = true;
 
 const ctx = canvas.getContext('2d');
 
@@ -150,24 +158,24 @@ function draw_background() {
 function draw() {
   draw_background();
 
-  if (show_ensamble || show_representatives) {
+  if (controls.show_ensamble || controls.show_reps) {
     const ordered = samples.sort((a,b) => a.value - b.value);
 
-    if (show_ensamble) {
+    if (controls.show_ensamble) {
       for (const [si,sample] of ordered.entries()) {
         const hue = si * 360 / controls.samples;
         sample.draw(`hsl(${hue}, 75%, 75%, 75%)`);
       }
     }
 
-    if (show_representatives) {
+    if (controls.show_reps) {
       ordered[0].draw('hsl(0, 75%, 75%)');
       ordered[Math.trunc(controls.samples / 2) - 1].draw('hsl(60, 75%, 75%)');
       ordered[controls.samples - 1].draw('hsl(120, 75%, 75%)');
     }
   }
 
-  if (show_average) {
+  if (controls.show_mean) {
     ctx.lineWidth = 4;
 
     const mean = new Sample();
