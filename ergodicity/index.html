@@ -36,6 +36,9 @@ label {
 input {
   width: 7em;
 }
+button {
+  grid-column-end: span 2;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 
@@ -45,6 +48,7 @@ input {
     <input v-model.number="time">
     <label>Samples</label>
     <input v-model.number="samples">
+    <button onclick="regenerate()">Run</button>
   </div>
 </aside>
 
