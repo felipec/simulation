@@ -181,7 +181,7 @@ function draw() {
     const mean = new Sample();
 
     for (let ti = 0; ti < controls.time; ti++) {
-      mean.value = samples.reduce((m, sample, si) => (m * si + sample.history[ti]) / (si + 1), 0);
+      mean.value = samples.reduce((m, sample, si) => (m * si + sample.history[ti + 1]) / (si + 1), 0);
     }
 
     mean.draw('hsl(240, 75%, 75%)');
