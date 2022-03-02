@@ -28,6 +28,7 @@ const times = 1_000_000;
 const params = new URLSearchParams(window.location.search);
 const jest = parseInt(params.get('jest') || '5');
 const loss = parseInt(params.get('loss') || '100');
+const trust = params.has('belief');
 
 var result;
  
@@ -49,7 +50,8 @@ function play() {
     const chase = cry && belief > 0;
     if (chase && !wolf) belief -= 0.5;
 
-    return wolf ? (chase ? 0 : -loss) : (chase ? jest : 0);
+    if (trust) return belief;
+    else return wolf ? (chase ? 0 : -loss) : (chase ? jest : 0);
   }
 
   return avg(3, round);
@@ -78,7 +80,7 @@ function resize_canvas() {
 resize_canvas();
 
 const r = avg(times, play);
-result = `${r.toFixed(2)}`;
+result = trust ? `${(r * 100).toFixed(2)}%` : `${r.toFixed(2)}`;
 draw();
 
 window.addEventListener('resize', resize_canvas, false);
