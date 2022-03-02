@@ -55,6 +55,7 @@ function play() {
       case 'cry': cry = true; break;
       case 'honest': cry = wolf; break;
       case 'haul': if (belief < 0.10) wolf = true; cry = wolf; break;
+      case 'bite': if (belief < 0.10) wolf = true; cry = false; break;
     }
 
     const chase = cry && belief > 0;
