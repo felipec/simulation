@@ -1,0 +1,82 @@
+<!doctype html>
+
+<meta charset="utf-8">
+<title>Boy who cried wolf</title>
+<style>
+html {
+  height: 100%;
+}
+body {
+  height: 100%;
+  display: flex;
+  margin: 0;
+}
+canvas {
+  background-color: hsl(240, 6.25%, 12.5%);
+  flex: 1;
+}
+</style>
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+const ctx = canvas.getContext('2d');
+
+const times = 1_000_000;
+
+var result;
+ 
+function avg(n, f) {
+  let avg = 0;
+  for (let i = 0; i < n; i++) {
+    avg = (avg * i + f()) / (i + 1);
+  }
+  return avg;
+}
+
+function play() {
+  let belief = 1.00;
+
+  function round() {
+    const cry = true;
+    let wolf = Math.random() >= 0.9;
+
+    const chase = cry && belief > 0;
+    if (chase && !wolf) belief -= 0.5;
+
+    return wolf ? (chase ? 0 : -100) : (chase ? 0 : 0);
+  }
+
+  return avg(3, round);
+}
+
+function draw() {
+  ctx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+
+  if (!result) return;
+
+  ctx.font = '192px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'hsl(0, 100%, 100%, 100%)';
+  ctx.fillText(result, 0, 0);
+}
+  
+function resize_canvas() {
+  canvas.width = document.body.offsetWidth - 1;
+  canvas.height = document.body.offsetHeight;
+
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  draw();
+}
+
+resize_canvas();
+
+const r = avg(times, play);
+result = `${r.toFixed(2)}`;
+draw();
+
+window.addEventListener('resize', resize_canvas, false);
+
+</script>
