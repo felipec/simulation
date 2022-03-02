@@ -25,6 +25,10 @@ const ctx = canvas.getContext('2d');
 
 const times = 1_000_000;
 
+const params = new URLSearchParams(window.location.search);
+const jest = parseInt(params.get('jest') || '5');
+const loss = parseInt(params.get('loss') || '100');
+
 var result;
  
 function avg(n, f) {
@@ -45,7 +49,7 @@ function play() {
     const chase = cry && belief > 0;
     if (chase && !wolf) belief -= 0.5;
 
-    return wolf ? (chase ? 0 : -100) : (chase ? 0 : 0);
+    return wolf ? (chase ? 0 : -loss) : (chase ? jest : 0);
   }
 
   return avg(3, round);
