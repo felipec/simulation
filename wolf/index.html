@@ -32,6 +32,7 @@ const trust = params.has('belief');
 const strategy = params.get('strategy') || 'cry';
 const initial_belief = parseInt(params.get('belief') || '100') / 100;
 const gain = parseInt(params.get('gain') || '0') / 100;
+const badger = params.has('badger');
 
 var result;
  
@@ -48,7 +49,7 @@ function play() {
 
   function round() {
     let cry;
-    let wolf = Math.random() >= 0.9;
+    let wolf = badger ? 0 : Math.random() >= 0.9;
 
     switch (strategy) {
       case 'cry': cry = true; break;
