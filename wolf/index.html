@@ -29,6 +29,9 @@ const params = new URLSearchParams(window.location.search);
 const jest = parseInt(params.get('jest') || '5');
 const loss = parseInt(params.get('loss') || '100');
 const trust = params.has('belief');
+const strategy = params.get('strategy') || 'cry';
+const initial_belief = parseInt(params.get('belief') || '100') / 100;
+const gain = parseInt(params.get('gain') || '0') / 100;
 
 var result;
  
@@ -41,14 +44,21 @@ function avg(n, f) {
 }
 
 function play() {
-  let belief = 1.00;
+  let belief = initial_belief;
 
   function round() {
-    const cry = true;
+    let cry;
     let wolf = Math.random() >= 0.9;
+
+    switch (strategy) {
+      case 'cry': cry = true; break;
+      case 'honest': cry = wolf; break;
+      case 'haul': if (belief < 0.10) wolf = true; cry = wolf; break;
+    }
 
     const chase = cry && belief > 0;
     if (chase && !wolf) belief -= 0.5;
+    if (!chase && wolf) belief += gain;
 
     if (trust) return belief;
     else return wolf ? (chase ? 0 : -loss) : (chase ? jest : 0);
